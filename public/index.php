@@ -43,6 +43,8 @@ require __DIR__.'/../vendor/autoload.php';
 | to this client's browser, allowing them to enjoy our application.
 |
 */
+// Helper
+require __DIR__ . "/../app/helpers.php";
 
 $app = require_once __DIR__.'/../bootstrap/app.php';
 

@@ -17,6 +17,7 @@ class CreateApplicantCvsTable extends Migration
             $table->id();
             $table->integer('application_id');
             $table->string('name');
+            $table->string('avatar')->nullable();
             $table->integer('work_experience')->nullable();
             $table->double('salary')->nullable();
             $table->text('description')->nullable();

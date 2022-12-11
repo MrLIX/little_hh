@@ -1,6 +1,7 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\AuthController;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,6 +15,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::post('auth/login', [AuthController::class, 'login']);
+
+Route::group(['middleware' => 'auth:api'], function () {
+    Route::group(['prefix' => 'vacancies', 'middleware' => 'role:' . User::TYPE_EMPLOYER], __DIR__ . '/api/vacancies.php');
+    Route::group(['prefix' => 'resume', 'middleware' => 'role:' . User::TYPE_APPLICANT], __DIR__ . '/api/resumes.php');
 });

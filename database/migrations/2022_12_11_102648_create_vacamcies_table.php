@@ -17,6 +17,7 @@ class CreateVacamciesTable extends Migration
             $table->id();
             $table->integer('employer_id');
             $table->integer('location_id');
+            $table->integer('position_id');
             $table->string('name');
             $table->double('salary')->nullable();
             $table->integer('work_experience')->nullable();
@@ -30,6 +31,8 @@ class CreateVacamciesTable extends Migration
             $table->foreign('employer_id')->references('id')->on('employers')
                 ->onDelete('cascade')->onUpdate('cascade');
             $table->foreign('location_id')->references('id')->on('locations')
+                ->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('position_id')->references('id')->on('references')
                 ->onDelete('cascade')->onUpdate('cascade');
         });
     }
