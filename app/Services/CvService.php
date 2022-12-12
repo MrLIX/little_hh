@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\ApplicantCv;
 use App\Models\BaseModel;
+use App\Models\BaseReferences;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -25,10 +26,7 @@ class CvService implements ICvService
         DB::beginTransaction();
         try {
             $cv = $this->saveCV();
-            $cv->skills()->createMany($this->data['skills']);
-            $cv->positions()->createMany($this->data['positions']);
-            $cv->languages()->createMany($this->changeValues($this->data['languages'] ?? [], 'level'));
-            $cv->socials()->createMany($this->changeValues($this->data['socials'] ?? [], 'url'));
+            $this->createReferences($cv);
             DB::commit();
             return $cv;
         } catch (\Exception $e) {
@@ -49,14 +47,8 @@ class CvService implements ICvService
             $cv->fill($this->data);
             $cv->avatar = $this->saveFile('avatar');
             $cv->save();
-            $cv->skills()->delete();
-            $cv->skills()->createMany($this->data['skills']);
-            $cv->positions()->delete();
-            $cv->positions()->createMany($this->data['skills']);
-            $cv->languages()->delete();
-            $cv->languages()->createMany($this->changeValues($this->data['languages'] ?? [], 'level'));
-            $cv->socials()->delete();
-            $cv->socials()->createMany($this->changeValues($this->data['socials'] ?? [], 'url'));
+            $this->deleteReferences($cv);
+            $this->createReferences($cv);
             DB::commit();
             return $cv;
         } catch (\Exception $e) {
@@ -74,25 +66,10 @@ class CvService implements ICvService
         $applicant_id = User::getAuthUserModelId(User::TYPE_APPLICANT);
         $cv = new ApplicantCv();
         $cv->fill($this->data);
-        $cv->application_id = $applicant_id;
+        $cv->applicant_id = $applicant_id;
         $cv->avatar = $this->saveFile('avatar');
         $cv->save();
         return $cv;
-    }
-
-    /**
-     * @param array $array
-     * @param $value
-     * @return \Illuminate\Support\Collection
-     */
-    protected function changeValues(array $array, $value = 'value')
-    {
-        return collect($array)->map(function ($item) use ($value) {
-            return [
-                'reference_id' => $item->reference_id,
-                'value' => $item->{$value}
-            ];
-        });
     }
 
     /**
@@ -106,5 +83,45 @@ class CvService implements ICvService
         return null;
     }
 
+    /**
+     * @param ApplicantCv $cv
+     * @return void
+     */
+    protected function createReferences(ApplicantCV $cv): void
+    {
+        $cv->skills()->createMany(($this->changeValues($this->data['skills'] ?? [], BaseReferences::TYPE_SKILLS)));
+        $cv->positions()->createMany($this->changeValues($this->data['positions'] ?? [], BaseReferences::TYPE_POSITIONS));
+        $cv->languages()->createMany($this->changeValues($this->data['languages'] ?? [], BaseReferences::TYPE_LANGUAGE, 'level'));
+        $cv->socials()->createMany($this->changeValues($this->data['socials'] ?? [], BaseReferences::TYPE_SOCIALS, 'url'));
+    }
+
+    /**
+     * @param ApplicantCv $cv
+     * @return void
+     */
+    protected function deleteReferences(ApplicantCv $cv): void
+    {
+        $cv->skills()->delete();
+        $cv->positions()->delete();
+        $cv->languages()->delete();
+        $cv->socials()->delete();
+    }
+
+    /**
+     * @param array $array
+     * @param string $type
+     * @param string $value
+     * @return array
+     */
+    protected function changeValues(array $array, string $type, string $value = 'value'): array
+    {
+        return collect($array)->map(function ($item) use ($value, $type) {
+            return [
+                'reference_id' => $item['reference_id'],
+                'reference_type' => $type,
+                'value' => $item[$value] ?? null
+            ];
+        })->toArray();
+    }
 
 }

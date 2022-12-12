@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 
 /**
  * @property integer $id
- * @property int $application_id
+ * @property int $applicant_id
  * @property string $name
  * @property string $avatar
  * @property int $work_experience
@@ -37,14 +37,14 @@ class ApplicantCv extends Model
     /**
      * @var array
      */
-    protected $fillable = ['application_id', 'name', 'avatar', 'work_experience', 'salary', 'description', 'about_me', 'is_online', 'created_at', 'updated_at', 'deleted_at'];
+    protected $fillable = ['applicant_id', 'name', 'avatar', 'work_experience', 'salary', 'description', 'about_me', 'is_online', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function applicant()
     {
-        return $this->belongsTo('App\Models\Applicant', 'application_id');
+        return $this->belongsTo(Applicant::class);
     }
 
     /**
@@ -68,7 +68,7 @@ class ApplicantCv extends Model
      */
     public function positions()
     {
-        return $this->hasMany('App\Models\VacancyReference')->where('type', BaseReferences::TYPE_POSITIONS);
+        return $this->hasMany('App\Models\CvReference','cv_id')->where('reference_type', BaseReferences::TYPE_POSITIONS);
     }
 
     /**
@@ -76,7 +76,7 @@ class ApplicantCv extends Model
      */
     public function skills()
     {
-        return $this->hasMany('App\Models\VacancyReference')->where('type', BaseReferences::TYPE_SKILLS);
+        return $this->hasMany('App\Models\CvReference', 'cv_id')->where('reference_type', BaseReferences::TYPE_SKILLS);
     }
 
     /**
@@ -84,7 +84,7 @@ class ApplicantCv extends Model
      */
     public function languages()
     {
-        return $this->hasMany('App\Models\VacancyReference')->where('type', BaseReferences::TYPE_LANGUAGE);
+        return $this->hasMany('App\Models\CvReference', 'cv_id')->where('reference_type', BaseReferences::TYPE_LANGUAGE);
     }
 
     /**
@@ -92,7 +92,7 @@ class ApplicantCv extends Model
      */
     public function socials()
     {
-        return $this->hasMany('App\Models\VacancyReference')->where('type', BaseReferences::TYPE_SOCIALS);
+        return $this->hasMany('App\Models\CvReference', 'cv_id')->where('reference_type', BaseReferences::TYPE_SOCIALS);
     }
 
 

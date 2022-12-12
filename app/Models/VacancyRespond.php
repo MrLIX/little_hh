@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property integer $id
  * @property int $vacancy_id
  * @property int $user_id
+ * @property int $cv_id
  * @property integer $status
  * @property string $created_at
  * @property string $updated_at
@@ -30,7 +31,7 @@ class VacancyRespond extends Model
     /**
      * @var array
      */
-    protected $fillable = ['vacancy_id', 'user_id', 'status', 'created_at', 'updated_at'];
+    protected $fillable = ['vacancy_id', 'user_id', 'cv_id', 'status', 'created_at', 'updated_at'];
 
     public function statuses()
     {
@@ -45,7 +46,7 @@ class VacancyRespond extends Model
     public function statusText()
     {
         $statuses = $this->statuses();
-        return $statuses[$this->status] ??$this->status;
+        return $statuses[$this->status] ?? $this->status;
     }
 
     /**
@@ -64,8 +65,19 @@ class VacancyRespond extends Model
         return $this->belongsTo('App\Models\Vacancy');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function applicant()
     {
         return $this->belongsTo(Applicant::class, 'user_id', 'user_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function cv()
+    {
+        return $this->belongsTo(ApplicantCv::class, 'cv_id', 'id');
     }
 }

@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CreateVacancyRequest;
 use App\Http\Resources\VacanciesIndexResource;
 use App\Http\Resources\VacancyRespondsResource;
+use App\Models\BaseReferences;
 use App\Models\Vacancy;
+use function PHPUnit\TestFixture\func;
 
-class VacancyController extends Controller
+class VacanciesController extends Controller
 {
     /**
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
@@ -42,8 +44,8 @@ class VacancyController extends Controller
         $data = $request->validated();
         $vacancy = (new Vacancy())->createFromData($data);
         if ($vacancy) {
-            $vacancy->skills()->createMany($data['skills']);
-            return success_out(new VacanciesIndexResource($vacancy));
+            $vacancy->skills()->createMany($this->normalizeSkillsData($data['skills']));
+            return success_out(VacanciesIndexResource::make($vacancy));
         }
         return error_out([], 422, 'Ошибка при создании!');
     }
@@ -59,7 +61,7 @@ class VacancyController extends Controller
         $vacancy->fill($data);
         if ($vacancy->save()) {
             $vacancy->skills()->delete();
-            $vacancy->skills()->create($data['skills']);
+            $vacancy->skills()->createMany($this->normalizeSkillsData($data['skills']));
             return success_out(new VacanciesIndexResource($vacancy));
         }
         return error_out([], 422, 'Ошибка при обнавлении!');
@@ -86,7 +88,18 @@ class VacancyController extends Controller
      */
     public function responds(Vacancy $vacancy)
     {
-        return success_out(VacancyRespondsResource::collection($vacancy->responds()));
+        return success_out(VacancyRespondsResource::collection($vacancy->responds));
+    }
+
+    /**
+     * @param $data
+     * @return array
+     */
+    protected function normalizeSkillsData($data): array
+    {
+        return collect($data)->map(function ($r) {
+            return ['reference_id' => $r['reference_id'], 'reference_type' => BaseReferences::TYPE_SKILLS];
+        })->toArray();
     }
 
 }

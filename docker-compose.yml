@@ -1,0 +1,27 @@
+version: "3.7"
+services:
+    app:
+        build:
+            context: ./
+            dockerfile: Dockerfile
+        image: hh-back
+        container_name: hh-app
+        restart: unless-stopped
+        working_dir: /var/www/
+        networks:
+            - app-network
+    nginx:
+        image: nginx:alpine
+        container_name: laravel-nginx
+        restart: unless-stopped
+        ports:
+            - 80:80
+        volumes:
+            - ./:/var/www
+            - ./nginx:/etc/nginx/conf.d
+        networks:
+            - app-network
+
+networks:
+    app-network:
+        driver: bridge

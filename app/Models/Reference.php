@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Reference extends BaseReferences
 {
-    use SoftDeletes;
+
     /**
      * The "type" of the auto-incrementing ID.
      *

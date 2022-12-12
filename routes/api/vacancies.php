@@ -1,11 +1,11 @@
 <?php
 
-use App\Http\Controllers\VacancyController;
+use App\Http\Controllers\VacanciesController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('', [VacancyController::class, 'index']);
-Route::get('/{vacancy}', [VacancyController::class, 'view']);
-Route::get('/responds/{vacancy}', [VacancyController::class, 'responds']);
-Route::post('', [VacancyController::class, 'create']);
-Route::put('/{vacancy}', [VacancyController::class, 'update']);
-Route::delete('/{vacancy}', [VacancyController::class, 'delete']);
+Route::get('', [VacanciesController::class, 'index']);
+Route::get('/{vacancy}', [VacanciesController::class, 'view']);
+Route::get('/responds/{vacancy}', [VacanciesController::class, 'responds']);
+Route::post('', [VacanciesController::class, 'create']);
+Route::put('/{vacancy}', [VacanciesController::class, 'update']);
+Route::delete('/{vacancy}', [VacanciesController::class, 'delete']);

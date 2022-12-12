@@ -20,17 +20,17 @@ class AuthController extends Controller
             'email' => 'required|email',
             'password' => 'required|string'
         ]);
-        $user = User::query()->where('email', $data['email'])
-            ->with('roles')
-            ->first();
+        $user = User::firstWhere('email', $data['email']);
 
         if (!$user || !Hash::check($data['password'], $user->password))
             return error_out(['email' => 'Неверный электронный адрес или пароль']);
         if ($user->status !== User::STATUS_ACTIVE)
             return error_out(['email' => 'Пользователь блокирован']);
 
-        $token = auth('api')->login($user);
-        return $this->respondWithToken($token);
+        if ($token = auth('api')->login($user))
+            return $this->respondWithToken($token);
+
+        return error_out(['email' => 'Неверный электронный адрес или пароль']);
     }
 
     /**
@@ -39,7 +39,7 @@ class AuthController extends Controller
      */
     public function logout()
     {
-        Auth::logout();
+        \auth('api')->logout();
         return success_out(['message' => 'Успешно!']);
     }
 

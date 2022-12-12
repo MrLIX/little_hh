@@ -17,6 +17,7 @@ class CreateVacamcyRespondsTable extends Migration
             $table->id();
             $table->integer('vacancy_id');
             $table->integer('user_id');
+            $table->integer('cv_id');
             $table->smallInteger('status')->default(1)->comment('1-new, 10-invitation, 0-reject, 2-archive');
             $table->timestamps();
 
@@ -25,6 +26,9 @@ class CreateVacamcyRespondsTable extends Migration
                 ->onDelete('cascade')->onUpdate('cascade');
 
             $table->foreign('user_id')->references('id')->on('users')
+                ->onDelete('cascade')->onUpdate('cascade');
+
+            $table->foreign('cv_id')->references('id')->on('applicant_cvs')
                 ->onDelete('cascade')->onUpdate('cascade');
         });
     }

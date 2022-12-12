@@ -15,7 +15,7 @@ class CreateApplicantCvsTable extends Migration
     {
         Schema::create('applicant_cvs', function (Blueprint $table) {
             $table->id();
-            $table->integer('application_id');
+            $table->integer('applicant_id');
             $table->string('name');
             $table->string('avatar')->nullable();
             $table->integer('work_experience')->nullable();
@@ -26,7 +26,7 @@ class CreateApplicantCvsTable extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            $table->foreign('application_id')->references('id')->on('applicants')
+            $table->foreign('applicant_id')->references('id')->on('applicants')
                 ->onDelete('cascade')->onUpdate('cascade');
         });
     }

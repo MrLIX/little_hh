@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 
 class AddRolesSeeder extends Seeder
@@ -28,7 +29,6 @@ class AddRolesSeeder extends Seeder
                 'guard_name' => 'api'
             ],
         ];
-        foreach ($data as $role)
-            Role::query()->create($role);
+        DB::table('roles')->insert($data);
     }
 }

@@ -6,6 +6,7 @@ use App\Traits\AuthEmployerTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -71,7 +72,7 @@ class Vacancy extends Model
      */
     public function views()
     {
-        return $this->hasMany('App\Models\VacancyView');
+        return $this->hasMany('App\Models\VacancyView', 'vacancy_id');
     }
 
     /**
@@ -79,7 +80,7 @@ class Vacancy extends Model
      */
     public function responds()
     {
-        return $this->hasMany('App\Models\VacancyRespond');
+        return $this->hasMany('App\Models\VacancyRespond', 'vacancy_id');
     }
 
     /**
@@ -95,12 +96,12 @@ class Vacancy extends Model
      */
     public function position()
     {
-        return $this->belongsTo('App\Models\VacancyReference', 'position_id');
+        return $this->belongsTo('App\Models\Reference', 'position_id');
     }
 
     public function skills()
     {
-        return $this->hasMany('App\Models\VacancyReference')->where('type', BaseReferences::TYPE_SKILLS);
+        return $this->hasMany('App\Models\VacancyReference')->where('reference_type', BaseReferences::TYPE_SKILLS);
     }
 
     /**
@@ -124,12 +125,38 @@ class Vacancy extends Model
 
     /**
      * @param Builder $q
-     * @param $positionsIds
+     * @param array $positionsIds
      * @return Builder
      */
-    public function scopePositionFilter(Builder $q, $positionsIds)
+    public function scopePositionFilter(Builder $q, array $positionsIds)
     {
-        return $q->whereIn('positions_id', $positionsIds);
+        return $q->whereIn('position_id', $positionsIds);
+    }
+
+    /**
+     * @return void
+     */
+    public function addView(): void
+    {
+        VacancyView::query()->updateOrCreate(['user_id' => Auth::id(), 'vacancy_id' => $this->id]);
+    }
+
+    /**
+     * @param int $cv_id
+     * @return void
+     */
+    public function respond(int $cv_id): void
+    {
+        try {
+            $respond = new VacancyRespond();
+            $respond->vacancy_id = $this->id;
+            $respond->user_id = Auth::id();
+            $respond->cv_id = $cv_id;
+            $respond->save();
+        } catch (\Exception $e) {
+            Log::error('ErrorSavingVacancyRespond#error: ' . $e->getMessage());
+        }
+
     }
 
 

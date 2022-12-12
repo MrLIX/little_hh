@@ -15,9 +15,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('auth/login', [AuthController::class, 'login']);
+Route::post('/v1/auth/login', [AuthController::class, 'login']);
 
-Route::group(['middleware' => 'auth:api'], function () {
-    Route::group(['prefix' => 'vacancies', 'middleware' => 'role:' . User::TYPE_EMPLOYER], __DIR__ . '/api/vacancies.php');
-    Route::group(['prefix' => 'resume', 'middleware' => 'role:' . User::TYPE_APPLICANT], __DIR__ . '/api/resumes.php');
+Route::group(['middleware' => 'auth:api', 'prefix' => 'v1'], function () {
+    Route::group(['prefix' => 'auth'], __DIR__ . '/api/auth.php');
+    Route::group(['prefix' => 'vacancies'], __DIR__ . '/api/vacancies.php');
+    Route::group(['prefix' => 'applicants'], __DIR__ . '/api/applicants.php');
+    Route::group(['prefix' => 'admin'], __DIR__ . '/api/admin.php');
 });
